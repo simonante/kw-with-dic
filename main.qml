@@ -93,6 +93,18 @@ Window {
         saveFile()
     }
     
+    function handleKeyDown(event) {
+        if (event.key === Qt.Key_Control) {
+            ctrlPressed = true
+        } else if (event.key === Qt.Key_D && ctrlPressed) {
+            isOmni2 = !isOmni2
+            event.accepted = true
+        } else if (event.key === Qt.Key_Q && ctrlPressed) {
+            Qt.quit()
+        }
+        saveFile()
+    }
+    
     function handleKeyUp(event) {
         if (event.key === Qt.Key_Control) {
             ctrlPressed = false
@@ -261,6 +273,7 @@ Window {
                             doLoad(omniList1.currentItem.text)
                         }
                         isOmni1 = true // isOmni1 = false
+                        isOmni2 = false
                         event.accepted = true
                         return
                     }
@@ -337,6 +350,7 @@ Window {
                             doLoad(omniList2.currentItem.text)
                         }
                         isOmni2 = true // isOmni2 = false
+                        isOmni1 = false
                         event.accepted = true
                         return
                     }
