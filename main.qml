@@ -16,7 +16,8 @@ Window {
     property bool ctrlPressed: false
     property bool isOmni1: false
     property bool isOmni2: false
-    property string omniQuery: ""
+    property string omniQuery1: ""
+    property string omniQuery2: ""
     property string currentFile: "scratch.md"
 //    property string folder: "file://%1/edit/".arg(home_dir)
 
@@ -243,17 +244,18 @@ Window {
         }
 
         Rectangle {
-            id: quick
+            id: quick1
             anchors.centerIn: parent
             width: parent.width
             height: parent.height
             color: "white"
             visible: isOmni1 ? true : false
+//            visible: isOmni2 ? false : true
             radius: 20
 
             TextEdit {
-                id: omniQueryTextEdit
-                text: omniQuery
+                id: omniQueryTextEdit1
+                text: omniQuery1
                 textFormat: TextEdit.PlainText
                 x: 40
                 width: parent.width
@@ -267,8 +269,8 @@ Window {
                             || event.key === Qt.Key_Return) {
                         saveFile()
                         if (!omniList1.currentItem) {
-                            initFile(omniQuery)
-                            doLoad(omniQuery + ".md")
+                            initFile(omniQuery1)
+                            doLoad(omniQuery1 + ".md")
                         } else {
                             doLoad(omniList1.currentItem.text)
                         }
@@ -283,15 +285,15 @@ Window {
                 Keys.onReleased: {
                     handleKeyUp(event)
                     handleKey(event)
-                    omniQuery = omniQueryTextEdit.text
-                    folderModel1.nameFilters = [omniQuery + "*"]
+                    omniQuery1 = omniQueryTextEdit1.text
+                    folderModel1.nameFilters = [omniQuery1 + "*"]
                 }
 
                 Keys.forwardTo: omniList1
             }
             ListView {
                 id: omniList1
-                anchors.top: omniQueryTextEdit.bottom
+                anchors.top: omniQueryTextEdit1.bottom
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.leftMargin: 68
@@ -326,10 +328,11 @@ Window {
             height: parent.height
             color: "white"
             visible: isOmni2 ? true : false
+//            visible: isOmni1 ? false : true
             radius: 20
 
             TextEdit {
-                id: omniQueryTextEdit
+                id: omniQueryTextEdit2
                 text: omniQuery
                 textFormat: TextEdit.PlainText
                 x: 40
@@ -360,7 +363,7 @@ Window {
                 Keys.onReleased: {
                     handleKeyUp(event)
                     handleKey(event)
-                    omniQuery = omniQueryTextEdit.text
+                    omniQuery = omniQueryTextEdit2.text
                     folderModel2.nameFilters = [omniQuery + "*"]
                 }
 
@@ -368,7 +371,7 @@ Window {
             }
             ListView {
                 id: omniList2
-                anchors.top: omniQueryTextEdit.bottom
+                anchors.top: omniQueryTextEdit2.bottom
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.leftMargin: 68
