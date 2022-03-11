@@ -333,7 +333,7 @@ Window {
 
             TextEdit {
                 id: omniQueryTextEdit2
-                text: omniQuery
+                text: omniQuery2
                 textFormat: TextEdit.PlainText
                 x: 40
                 width: parent.width
@@ -347,8 +347,8 @@ Window {
                             || event.key === Qt.Key_Return) {
                         saveFile()
                         if (!omniList2.currentItem) {
-                            initFile(omniQuery)
-                            doLoad(omniQuery + ".md")
+                            initFile(omniQuery2)
+                            doLoad(omniQuery2 + ".md")
                         } else {
                             doLoad(omniList2.currentItem.text)
                         }
@@ -363,8 +363,8 @@ Window {
                 Keys.onReleased: {
                     handleKeyUp(event)
                     handleKey(event)
-                    omniQuery = omniQueryTextEdit2.text
-                    folderModel2.nameFilters = [omniQuery + "*"]
+                    omniQuery2 = omniQueryTextEdit2.text
+                    folderModel2.nameFilters = [omniQuery2 + "*"]
                 }
 
                 Keys.forwardTo: omniList2
