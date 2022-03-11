@@ -306,7 +306,7 @@ Window {
                     width: 600
                 }
                 Component {
-                    id: fileDelegate
+                    id: fileDelegate1
                     Text {
                         width: parent.width
                         text: fileName
@@ -317,7 +317,7 @@ Window {
                 }
 
                 model: folderModel1
-                delegate: fileDelegate
+                delegate: fileDelegate1
             }
         }
         
@@ -384,7 +384,7 @@ Window {
                     width: 600
                 }
                 Component {
-                    id: fileDelegate
+                    id: fileDelegate2
                     Text {
                         width: parent.width
                         text: fileName
@@ -395,7 +395,7 @@ Window {
                 }
 
                 model: folderModel2
-                delegate: fileDelegate
+                delegate: fileDelegate2
             }
         }
     }
