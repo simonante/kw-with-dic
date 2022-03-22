@@ -14,22 +14,15 @@ Window {
     property string doc: "scratch"
     property int mode: 1
     property bool ctrlPressed: false
-    property bool isOmni1: false
-    property bool isOmni2: false
-    property string omniQuery1: ""
-    property string omniQuery2: ""
+    property bool isOmni: false
+    property string omniQuery: ""
     property string currentFile: "scratch.md"
 //    property string folder: "file://%1/edit/".arg(home_dir)
 
     FolderListModel {
-        id: folderModel1
+        id: folderModel
+//            folder: root.folder
         folder: "file:///home/root/edit/"
-        nameFilters: ["*.md"]
-    }
-    
-    FolderListModel {
-        id: folderModel2
-        folder: "file:///home/root/dic/"
         nameFilters: ["*.md"]
     }
 
@@ -50,8 +43,7 @@ Window {
         xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 var response = xhr.responseText
-                isOmni1 = false
-                isOmni2 = false
+                isOmni = false
                 mode = 1 // first edit mode?
                 currentFile = name
                 doc = response
@@ -86,26 +78,13 @@ Window {
         if (event.key === Qt.Key_Control) {
             ctrlPressed = true
         } else if (event.key === Qt.Key_K && ctrlPressed) {
-            isOmni1 = !isOmni1
+            isOmni = !isOmni
             event.accepted = true
         } else if (event.key === Qt.Key_Q && ctrlPressed) {
             Qt.quit()
         }
         saveFile()
     }
-    
-    function handleKeyDown(event) {
-        if (event.key === Qt.Key_Control) {
-            ctrlPressed = true
-        } else if (event.key === Qt.Key_D && ctrlPressed) {
-            isOmni2 = !isOmni2
-            event.accepted = true
-        } else if (event.key === Qt.Key_Q && ctrlPressed) {
-            Qt.quit()
-        }
-        saveFile()
-    }
-    
     function handleKeyUp(event) {
         if (event.key === Qt.Key_Control) {
             ctrlPressed = false
@@ -114,10 +93,8 @@ Window {
 
     function handleKey(event) {
         if (event.key === Qt.Key_Escape) {
-            if (isOmni1) {
-                isOmni1 = false
-            if (isOmni2) {
-                isOmni2 = false
+            if (isOmni) {
+                isOmni = false
             } else {
 
                 toggleMode()
@@ -205,14 +182,14 @@ Window {
                 textFormat: mode == 0 ? TextEdit.PlainText : TextEdit.PlainText
                 font.family: mode == 0 ? "Noto Mono" : "Noto Mono"
                 text: mode == 0 ? doc : doc
-                focus: !isOmni1
+                focus: !isOmni
                 Component {
                     id: curDelegate
                     Rectangle { width:8; height: 20; visible: query.cursorVisible; color: "black";}
                 }
                 cursorDelegate: curDelegate
                 readOnly: mode == 0 ? false : false
-                font.pointSize: mode == 0 ? 7.5 : 7.5
+                font.pointSize: mode == 0 ? 6.6 : 6.6
 
                 onLinkActivated: {
                     console.log("Link activated: " + link)
@@ -233,127 +210,72 @@ Window {
                         flick.scrollUpBig();
                     }
 
-                    handleKeyDown(event);
-                }
-
-                Keys.onReleased: {
-                    handleKeyUp(event)
-                    handleKey(event)
-                }
-            }
-        }
-
-        Rectangle {
-            id: quick1
-            anchors.centerIn: parent
-            width: parent.width
-            height: parent.height
-            color: "white"
-            visible: isOmni1 ? true : false
-//            visible: isOmni2 ? false : true
-            radius: 20
-
-            TextEdit {
-                id: omniQueryTextEdit1
-                text: omniQuery1
-                textFormat: TextEdit.PlainText
-                x: 40
-                width: parent.width
-                color: "white"
-                font.pointSize: 7.7
-                font.family: "Noto Mono"
-                focus: isOmni1
-                Keys.enabled: true
-                Keys.onPressed: {
-                    if (event.key === Qt.Key_Enter
-                            || event.key === Qt.Key_Return) {
-                        saveFile()
-                        if (!omniList1.currentItem) {
-                            initFile(omniQuery1)
-                            doLoad(omniQuery1 + ".md")
-                        } else {
-                            doLoad(omniList1.currentItem.text)
-                        }
-                        isOmni1 = true // isOmni1 = false
-                        isOmni2 = false
-                        event.accepted = true
-                        return
-                    }
-
                     handleKeyDown(event)
                 }
+
                 Keys.onReleased: {
                     handleKeyUp(event)
                     handleKey(event)
-                    omniQuery1 = omniQueryTextEdit1.text
-                    folderModel1.nameFilters = [omniQuery1 + "*"]
                 }
-
-                Keys.forwardTo: omniList1
-            }
-            ListView {
-                id: omniList1
-                anchors.top: omniQueryTextEdit1.bottom
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.leftMargin: 68
-                anchors.rightMargin: 40
-                anchors.right: parent.right
-                highlightResizeDuration: 0
-                highlight: Rectangle {
-                    color: "black"
-                    radius: 2
-                    width: 600
-                }
-                Component {
-                    id: fileDelegate1
-                    Text {
-                        width: parent.width
-                        text: fileName
-                        font.pointSize: 7.5
-                        font.family: "Noto Mono"
-                        color: ListView.isCurrentItem ? "white" : "black"
-                    }
-                }
-
-                model: folderModel1
-                delegate: fileDelegate1
             }
         }
         
         Rectangle {
-            id: quick2
+            id: downbox;
+            width: 100
+            height: 80
+            color: "white"
+            border.color: "black"
+            border.width: 3
+            radius: 10
+            y: 5; anchors.left: qbox.right;
+
+            Text {
+                id: sc
+                text: "<font size='+1' face='Noto Mono'>x</font>"
+                textFormat: Text.RichText
+                anchors {horizontalCenter: parent.horizontalCenter;}
+            }
+            MouseArea {
+                id: downMouseArea
+                anchors.fill: parent
+                onClicked: {
+                    isOmni = !isOmni
+                }
+            }
+        }
+
+        Rectangle {
+            id: quick
             anchors.centerIn: parent
             width: parent.width
             height: parent.height
             color: "white"
-            visible: isOmni2 ? true : false
-//            visible: isOmni1 ? false : true
+            visible: isOmni ? true : false
             radius: 20
 
             TextEdit {
-                id: omniQueryTextEdit2
-                text: omniQuery2
+                id: omniQueryTextEdit
+                text: omniQuery
                 textFormat: TextEdit.PlainText
                 x: 40
                 width: parent.width
                 color: "white"
                 font.pointSize: 7.7
                 font.family: "Noto Mono"
-                focus: isOmni2
+                focus: isOmni
                 Keys.enabled: true
                 Keys.onPressed: {
                     if (event.key === Qt.Key_Enter
                             || event.key === Qt.Key_Return) {
                         saveFile()
-                        if (!omniList2.currentItem) {
-                            initFile(omniQuery2)
-                            doLoad(omniQuery2 + ".md")
+                        if (!omniList.currentItem) {
+                            initFile(omniQuery)
+                            doLoad(omniQuery + ".md")
                         } else {
-                            doLoad(omniList2.currentItem.text)
+                            doLoad(omniList.currentItem.text)
                         }
-                        isOmni2 = true // isOmni2 = false
-                        isOmni1 = false
+                        isOmni = true // isOmni = false
                         event.accepted = true
                         return
                     }
@@ -363,15 +285,15 @@ Window {
                 Keys.onReleased: {
                     handleKeyUp(event)
                     handleKey(event)
-                    omniQuery2 = omniQueryTextEdit2.text
-                    folderModel2.nameFilters = [omniQuery2 + "*"]
+                    omniQuery = omniQueryTextEdit.text
+                    folderModel.nameFilters = [omniQuery + "*"]
                 }
 
-                Keys.forwardTo: omniList2
+                Keys.forwardTo: omniList
             }
             ListView {
-                id: omniList2
-                anchors.top: omniQueryTextEdit2.bottom
+                id: omniList
+                anchors.top: omniQueryTextEdit.bottom
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.leftMargin: 68
@@ -384,18 +306,18 @@ Window {
                     width: 600
                 }
                 Component {
-                    id: fileDelegate2
+                    id: fileDelegate
                     Text {
                         width: parent.width
                         text: fileName
-                        font.pointSize: 7.5
+                        font.pointSize: 6.6
                         font.family: "Noto Mono"
                         color: ListView.isCurrentItem ? "white" : "black"
                     }
                 }
 
-                model: folderModel2
-                delegate: fileDelegate2
+                model: folderModel
+                delegate: fileDelegate
             }
         }
     }
